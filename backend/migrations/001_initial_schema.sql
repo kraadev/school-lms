@@ -1,0 +1,97 @@
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+CREATE TABLE roles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(50) UNIQUE NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    role_id UUID NOT NULL REFERENCES roles(id),
+    username VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(150) UNIQUE,
+    password_hash TEXT NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE students (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    nis VARCHAR(50) UNIQUE NOT NULL,
+    nisn VARCHAR(50) UNIQUE,
+    full_name VARCHAR(150) NOT NULL,
+    gender VARCHAR(20),
+    phone VARCHAR(30),
+    address TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE teachers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    nip VARCHAR(50) UNIQUE,
+    full_name VARCHAR(150) NOT NULL,
+    phone VARCHAR(30),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE admins (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    full_name VARCHAR(150) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE academic_years (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(20) NOT NULL,
+    semester SMALLINT NOT NULL CHECK (semester IN (1, 2)),
+    is_active BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE classes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    academic_year_id UUID NOT NULL REFERENCES academic_years(id),
+    name VARCHAR(100) NOT NULL,
+    grade SMALLINT NOT NULL,
+    major VARCHAR(100),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE class_students (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    class_id UUID NOT NULL REFERENCES classes(id) ON DELETE CASCADE,
+    student_id UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(class_id, student_id)
+);
+
+CREATE TABLE subjects (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    code VARCHAR(50) UNIQUE,
+    name VARCHAR(150) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE class_subjects (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    class_id UUID NOT NULL REFERENCES classes(id) ON DELETE CASCADE,
+    subject_id UUID NOT NULL REFERENCES subjects(id) ON DELETE CASCADE,
+    teacher_id UUID REFERENCES teachers(id) ON DELETE SET NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(class_id, subject_id)
+);

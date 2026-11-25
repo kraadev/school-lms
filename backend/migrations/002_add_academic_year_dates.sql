@@ -1,0 +1,4 @@
+ALTER TABLE academic_years
+ADD COLUMN start_date DATE NOT NULL DEFAULT CURRENT_DATE,
+ADD COLUMN end_date DATE NOT NULL DEFAULT CURRENT_DATE,
+ADD CONSTRAINT chk_academic_dates CHECK (end_date >= start_date);

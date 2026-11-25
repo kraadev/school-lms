@@ -1,0 +1,2 @@
+ALTER TABLE attendance_sessions
+    ADD COLUMN IF NOT EXISTS auto_schedule BOOLEAN NOT NULL DEFAULT FALSE;

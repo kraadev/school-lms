@@ -1,0 +1,33 @@
+# Environment files and local secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Dependencies and generated frontend files
+**/node_modules/
+frontend/.nuxt/
+frontend/.output/
+frontend/.data/
+frontend/.nitro/
+frontend/dist/
+
+# Local certificates and private keys
+frontend/certs/
+*.pem
+*.key
+
+# Local backend data and generated files
+backend/uploads/
+backend/tmp/
+backend/bin/
+backend/*.exe
+backend/*.log
+backend/temp.zip
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+*.swp
